@@ -17,7 +17,7 @@ namespace Hadouken.Http.HttpServer
     public class DefaultHttpServer : IHttpServer
     {
         private static readonly int DefaultPort = 8081;
-        private static readonly string DefaultBinding = "http://localhost:{port}/";
+        private static readonly string DefaultBinding = "http://+:{port}/";
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -59,7 +59,7 @@ namespace Hadouken.Http.HttpServer
 
             ReceiveLoop();
 
-            Logger.Info("HTTP server up and running on address " + ListenUri);
+            Logger.Info("HTTP server up and running on address " + binding);
         }
 
         public void Stop()
@@ -86,7 +86,7 @@ namespace Hadouken.Http.HttpServer
 
         private string GetBinding()
         {
-            var binding = _registryReader.ReadString("webui.binding", DefaultBinding);
+            var binding = DefaultBinding;
             var port = _registryReader.ReadInt("webui.port", DefaultPort);
 
             // Allow overriding from application configuration file.
@@ -147,9 +147,12 @@ namespace Hadouken.Http.HttpServer
                 }
                 else
                 {
+                    Logger.Info("Unauthorized user request.");
+
                     context.Response.Unauthorized();
                 }
 
+                context.Response.OutputStream.Close();
                 context.Response.Close();
             }
             catch(Exception e)
