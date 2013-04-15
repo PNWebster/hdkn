@@ -13,9 +13,6 @@ namespace Hadouken.UnitTests
 
         public MemoryConfigManager()
         {
-            config.Add("Assembly.Hadouken.Impl", "Hadouken.Impl");
-            config.Add("Assembly.Hadouken.Impl.Bt", "Hadouken.Impl.BitTorrent");
-
             config.Add("Paths.Data", "Data");
             config.Add("Paths.Logs", "Logs");
             config.Add("Paths.Plugins", "Plugins");

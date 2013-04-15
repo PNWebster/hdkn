@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -13,19 +14,16 @@ namespace Hadouken.Hosts.WindowsService
     {
         public static void Main()
         {
-            var assemblies = new List<Assembly>();
+            var root = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-            foreach (string key in ConfigurationManager.AppSettings.Keys)
-            {
-                if (key.StartsWith("Assembly."))
-                {
-                    assemblies.Add(AppDomain.CurrentDomain.Load(ConfigurationManager.AppSettings[key]));
-                }
-            }
+            if (String.IsNullOrEmpty(root))
+                throw new InvalidDataException("Invalid root path");
 
             // register base types
             Kernel.SetResolver(new NinjectDependencyResolver());
-            Kernel.Register(assemblies.ToArray());
+            Kernel.Register(Directory.GetFiles(root, "*.dll")
+                                     .Select(file => AppDomain.CurrentDomain.Load(File.ReadAllBytes(file)))
+                                     .ToArray());
 
             if(Bootstrapper.RunAsConsoleIfRequested<HdknService>())
                 return;
