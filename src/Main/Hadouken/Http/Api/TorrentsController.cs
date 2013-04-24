@@ -68,6 +68,23 @@ namespace Hadouken.Http.Api
                 };
         }
 
+        public HttpResponseMessage Post([FromBody] PostTorrent[] data)
+        {
+            foreach (var d in data)
+            {
+                if (d.Data != null)
+                {
+                    var torrentData = Convert.FromBase64String(d.Data);
+                    var m = _torrentEngine.AddTorrent(torrentData, d.SavePath);
+
+                    if (!String.IsNullOrEmpty(d.Label))
+                        m.Label = d.Label;
+                }
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.NoContent);
+        }
+
         public HttpResponseMessage Put(string id, [FromBody] EditTorrent data)
         {
             if (!_torrentEngine.Managers.ContainsKey(id))
