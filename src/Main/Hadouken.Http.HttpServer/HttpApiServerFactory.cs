@@ -20,6 +20,9 @@ namespace Hadouken.Http.HttpServer
         public IHttpApiServer CreateHttpApiServer(Uri baseAddress, params System.Reflection.Assembly[] assemblies)
         {
             var config = new HttpSelfHostConfiguration(baseAddress);
+
+            // Set dependency resolver
+            config.DependencyResolver = new ApiDependencyResolver();
             
             // Set basic auth
             config.ClientCredentialType = HttpClientCredentialType.Basic;

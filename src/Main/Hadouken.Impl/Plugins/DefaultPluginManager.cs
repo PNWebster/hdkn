@@ -10,6 +10,7 @@ using System.Reflection;
 using NLog;
 using Hadouken.Messaging;
 using Hadouken.Messages;
+using Hadouken.Http;
 
 namespace Hadouken.Impl.Plugins
 {
@@ -22,13 +23,15 @@ namespace Hadouken.Impl.Plugins
 
         private IMessageBus _mbus;
         private IMigrationRunner _runner;
+        private readonly IHttpApiServer _apiServer;
 
-        internal DefaultPluginManager(Type pluginType, IMessageBus mbus, IMigrationRunner runner)
+        internal DefaultPluginManager(Type pluginType, IMessageBus mbus, IMigrationRunner runner, IHttpApiServer apiServer)
         {
             _pluginType = pluginType;
 
             _mbus = mbus;
             _runner = runner;
+            _apiServer = apiServer;
         }
 
         internal void Initialize()
@@ -77,12 +80,14 @@ namespace Hadouken.Impl.Plugins
 
         public void Load()
         {
+            _apiServer.Start();
             _instance.Load();
         }
 
         public void Unload()
         {
             _instance.Unload();
+            _apiServer.Stop();
         }
 
         public void Install()

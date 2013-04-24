@@ -19,7 +19,7 @@ namespace Hadouken.DI.Ninject
 
         public object Get(Type t)
         {
-            return _kernel.Get(t);
+            return _kernel.TryGet(t);
         }
 
         public object Get(Type t, string name)
@@ -41,6 +41,11 @@ namespace Hadouken.DI.Ninject
         {
             return _kernel.GetAll<T>();
         }
+
+        public IEnumerable<object> GetAll(Type serviceType)
+        {
+            return _kernel.GetAll(serviceType);
+        } 
 
         public T TryGet<T>()
         {

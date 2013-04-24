@@ -59,8 +59,8 @@ namespace Hadouken.Impl.Hosting
             _torrentEngine.Load();
             _pluginEngine.Load();
 
-            _httpServer.Start();
             _apiServer.Start();
+            _httpServer.Start();
         }
 
         public void Unload()
@@ -70,6 +70,7 @@ namespace Hadouken.Impl.Hosting
             _torrentEngine.Unload();
 
             _httpServer.Stop();
+            _apiServer.Stop();
         }
     }
 }

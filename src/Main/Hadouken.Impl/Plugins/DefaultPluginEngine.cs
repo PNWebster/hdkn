@@ -10,6 +10,7 @@ using Hadouken.Configuration;
 using Hadouken.IO;
 using Hadouken.Reflection;
 using NLog;
+using Hadouken.Http;
 
 namespace Hadouken.Impl.Plugins
 {
@@ -25,9 +26,12 @@ namespace Hadouken.Impl.Plugins
         private IMigrationRunner _runner;
         private IPluginLoader[] _loaders;
 
-        public DefaultPluginEngine(IFileSystem fs, IDataRepository repo, IMessageBus mbus, IMigrationRunner runner, IPluginLoader[] loaders)
+        private readonly IHttpApiServerFactory _apiServerFactory;
+
+        public DefaultPluginEngine(IFileSystem fs, IHttpApiServerFactory apiServerFactory, IDataRepository repo, IMessageBus mbus, IMigrationRunner runner, IPluginLoader[] loaders)
         {
             _fs = fs;
+            _apiServerFactory = apiServerFactory;
             _repo = repo;
             _mbus = mbus;
             _runner = runner;
@@ -82,7 +86,13 @@ namespace Hadouken.Impl.Plugins
             if (_managers.ContainsKey(attr.Name))
                 return;
 
-            var manager = new DefaultPluginManager(pluginType, _mbus, _runner);
+            // Create an API server for this plugin
+            var apiServer =
+                _apiServerFactory.CreateHttpApiServer(
+                    new Uri("http://localhost:8081/api/plugins/" + attr.Name.ToLowerInvariant()),
+                    pluginType.Assembly);
+
+            var manager = new DefaultPluginManager(pluginType, _mbus, _runner, apiServer);
             manager.Initialize();
 
             // Check if we have a PluginInfo for this plugin.

@@ -69,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiDependencyResolver.cs" />
     <Compile Include="CustomAssembliesResolver.cs" />
     <Compile Include="DefaultHttpServer.cs" />
     <Compile Include="FileSystemContent.cs" />
