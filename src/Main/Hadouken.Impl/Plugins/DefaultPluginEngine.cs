@@ -27,11 +27,13 @@ namespace Hadouken.Impl.Plugins
         private IPluginLoader[] _loaders;
 
         private readonly IHttpApiServerFactory _apiServerFactory;
+        private readonly IUriBuilder _uriBuilder;
 
-        public DefaultPluginEngine(IFileSystem fs, IHttpApiServerFactory apiServerFactory, IDataRepository repo, IMessageBus mbus, IMigrationRunner runner, IPluginLoader[] loaders)
+        public DefaultPluginEngine(IFileSystem fs, IHttpApiServerFactory apiServerFactory, IUriBuilder uriBuilder, IDataRepository repo, IMessageBus mbus, IMigrationRunner runner, IPluginLoader[] loaders)
         {
             _fs = fs;
             _apiServerFactory = apiServerFactory;
+            _uriBuilder = uriBuilder;
             _repo = repo;
             _mbus = mbus;
             _runner = runner;
@@ -89,7 +91,7 @@ namespace Hadouken.Impl.Plugins
             // Create an API server for this plugin
             var apiServer =
                 _apiServerFactory.CreateHttpApiServer(
-                    new Uri("http://localhost:8081/api/plugins/" + attr.Name.ToLowerInvariant()),
+                    _uriBuilder.Build("api", "plugins", attr.Name.ToLowerInvariant()),
                     pluginType.Assembly);
 
             var manager = new DefaultPluginManager(pluginType, _mbus, _runner, apiServer);

@@ -23,7 +23,7 @@ namespace Hadouken.Impl.Hosting
 
         private readonly IHttpApiServer _apiServer;
 
-        public DefaultHost(IHttpApiServerFactory httpApiServerFactory, IDataRepository data, IBitTorrentEngine torrentEngine, IMigrationRunner runner, IPluginEngine pluginEngine, IHttpServer httpServer)
+        public DefaultHost(IHttpApiServerFactory httpApiServerFactory, IUriBuilder uriBuilder, IDataRepository data, IBitTorrentEngine torrentEngine, IMigrationRunner runner, IPluginEngine pluginEngine, IHttpServer httpServer)
         {
             _data = data;
             _torrentEngine = torrentEngine;
@@ -31,7 +31,7 @@ namespace Hadouken.Impl.Hosting
             _pluginEngine = pluginEngine;
             _httpServer = httpServer;
 
-            _apiServer = httpApiServerFactory.CreateHttpApiServer(new Uri("http://localhost:8081/api"),
+            _apiServer = httpApiServerFactory.CreateHttpApiServer(uriBuilder.Build("api"),
                                                                   typeof (Kernel).Assembly);
 
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);

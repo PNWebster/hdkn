@@ -26,6 +26,6 @@ namespace Hadouken.Http.Api
                                        plugin.Value.Version
                                    }).ToArray()
                 };
-        } 
+        }
     }
 }

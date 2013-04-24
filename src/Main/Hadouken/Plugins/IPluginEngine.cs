@@ -13,5 +13,6 @@ namespace Hadouken.Plugins
         void UnloadAll();
 
         IDictionary<string, IPluginManager> Managers { get;}
+
     }
 }

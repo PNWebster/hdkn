@@ -110,6 +110,7 @@
     <Compile Include="Http\IHttpApiServer.cs" />
     <Compile Include="Http\IHttpServer.cs" />
     <Compile Include="Http\IHttpApiServerFactory.cs" />
+    <Compile Include="Http\IUriBuilder.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Messaging\IMessage.cs" />

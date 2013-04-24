@@ -16,32 +16,29 @@ namespace Hadouken.Http.HttpServer
 {
     public class DefaultHttpServer : IHttpServer
     {
-        private static readonly int DefaultPort = 8081;
-        private static readonly string DefaultBinding = "http://+:{port}/";
-
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private readonly IFileSystem _fileSystem;
         private readonly IKeyValueStore _keyValueStore;
-        private readonly IRegistryReader _registryReader;
+        private readonly IUriBuilder _uriBuilder;
 
         private HttpListener _listener;
         private string _webUIPath;
 
         
-        public DefaultHttpServer(IKeyValueStore keyValueStore, IRegistryReader registryReader, IFileSystem fileSystem)
+        public DefaultHttpServer(IUriBuilder uriBuilder, IKeyValueStore keyValueStore, IFileSystem fileSystem)
         {
             _keyValueStore = keyValueStore;
-            _registryReader = registryReader;
             _fileSystem = fileSystem;
+            _uriBuilder = uriBuilder;
         }
 
         public void Start()
         {
-            var binding = GetBinding();
+            var binding = _uriBuilder.Build();
 
             _listener = new HttpListener();
-            _listener.Prefixes.Add(binding);
+            _listener.Prefixes.Add(binding.ToString());
             _listener.AuthenticationSchemes = AuthenticationSchemes.Basic;
 
             UnzipWebUI();
@@ -80,21 +77,6 @@ namespace Hadouken.Http.HttpServer
 
                 return null;
             }
-        }
-
-        private string GetBinding()
-        {
-            var binding = DefaultBinding;
-            var port = _registryReader.ReadInt("webui.port", DefaultPort);
-
-            // Allow overriding from application configuration file.
-            if (HdknConfig.ConfigManager.AllKeys.Contains("WebUI.Binding"))
-                binding = HdknConfig.ConfigManager["WebUI.Binding"];
-
-            if (HdknConfig.ConfigManager.AllKeys.Contains("WebUI.Port"))
-                port = Convert.ToInt32(HdknConfig.ConfigManager["WebUI.Port"]);
-
-            return binding.Replace("{port}", port.ToString());;
         }
 
         private void ReceiveLoop()
