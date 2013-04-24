@@ -113,6 +113,8 @@
     <Compile Include="Http\IHttpServer.cs" />
     <Compile Include="Http\IHttpApiServerFactory.cs" />
     <Compile Include="Http\IUriBuilder.cs" />
+    <Compile Include="Http\ViewModels\EditTorrent.cs" />
+    <Compile Include="Http\ViewModels\TorrentProperties.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Messaging\IMessage.cs" />
