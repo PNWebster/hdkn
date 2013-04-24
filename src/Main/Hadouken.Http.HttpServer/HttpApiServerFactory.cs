@@ -42,6 +42,11 @@ namespace Hadouken.Http.HttpServer
             config.Formatters.Add(formatter);
 
             config.Routes.MapHttpRoute(
+                "API Action route",
+                "{controller}/{id}/{action}"
+            );
+
+            config.Routes.MapHttpRoute(
                 "API Default",
                 "{controller}/{id}",
                 new { controller = "System", id = RouteParameter.Optional }
