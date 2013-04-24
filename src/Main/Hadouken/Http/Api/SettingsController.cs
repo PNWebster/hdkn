@@ -1,20 +1,25 @@
-﻿using Hadouken.Configuration;
+﻿using System.Net;
+using Hadouken.Configuration;
 using Hadouken.Data;
 using Hadouken.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Web.Http;
 
 namespace Hadouken.Http.Api
 {
     public class SettingsController : HttpApiController
     {
         private readonly IDataRepository _repository;
+        private readonly IKeyValueStore _keyValueStore;
 
-        public SettingsController(IDataRepository repository)
+        public SettingsController(IDataRepository repository, IKeyValueStore keyValueStore)
         {
             _repository = repository;
+            _keyValueStore = keyValueStore;
         }
 
         public object Get()
@@ -32,6 +37,16 @@ namespace Hadouken.Http.Api
                                         setting.Options
                                     })
                 };
+        }
+
+        public HttpResponseMessage Post([FromBody] Dictionary<string, object> data)
+        {
+            foreach (var key in data.Keys)
+            {
+                _keyValueStore.Set(key, data[key]);
+            }
+
+            return new HttpResponseMessage(HttpStatusCode.NoContent);
         }
 
         private int GetSettingType(string type)
