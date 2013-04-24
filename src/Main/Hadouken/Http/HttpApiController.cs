@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.IO;
+using System.Web.Http;
 
 namespace Hadouken.Http
 {
-    public abstract class ActionResult
+    public abstract class HttpApiController : ApiController
     {
-        public abstract void Execute(IHttpContext context);
     }
 }

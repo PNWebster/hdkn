@@ -46,10 +46,25 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\lib\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\lib\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\lib\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\lib\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\..\lib\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -87,38 +102,13 @@
     <Compile Include="Data\TableAttribute.cs" />
     <Compile Include="DI\IDependencyResolver.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
-    <Compile Include="Extensions\HttpListenerResponseExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Hosting\IHost.cs" />
-    <Compile Include="Http\ApiActionAttribute.cs" />
-    <Compile Include="Http\Api\AddFile.cs" />
-    <Compile Include="Http\Api\AddUrl.cs" />
-    <Compile Include="Http\Api\GetPeers.cs" />
-    <Compile Include="Http\Api\GetPluginFile.cs" />
-    <Compile Include="Http\Api\GetPlugins.cs" />
-    <Compile Include="Http\Api\GetProperties.cs" />
-    <Compile Include="Http\Api\GetSettings.cs" />
-    <Compile Include="Http\Api\GetSystemInfo.cs" />
-    <Compile Include="Http\Api\GetTorrentFiles.cs" />
-    <Compile Include="Http\Api\GetTorrents.cs" />
-    <Compile Include="Http\Api\ListDirectories.cs" />
-    <Compile Include="Http\Api\PauseTorrent.cs" />
-    <Compile Include="Http\Api\RemoveTorrent.cs" />
-    <Compile Include="Http\Api\SetProperties.cs" />
-    <Compile Include="Http\Api\SetSetting.cs" />
-    <Compile Include="Http\Api\StartTorrent.cs" />
-    <Compile Include="Http\Api\StopTorrent.cs" />
-    <Compile Include="Http\ContentResult.cs" />
-    <Compile Include="Http\ActionResult.cs" />
-    <Compile Include="Http\ApiAction.cs" />
-    <Compile Include="Http\IApiAction.cs" />
-    <Compile Include="Http\IHttpPostedFile.cs" />
-    <Compile Include="Http\IHttpContext.cs" />
-    <Compile Include="Http\IHttpRequest.cs" />
-    <Compile Include="Http\IHttpResponse.cs" />
+    <Compile Include="Http\Api\SystemController.cs" />
+    <Compile Include="Http\HttpApiController.cs" />
+    <Compile Include="Http\IHttpApiServer.cs" />
     <Compile Include="Http\IHttpServer.cs" />
-    <Compile Include="Http\JsonResult.cs" />
-    <Compile Include="Http\RedirectResult.cs" />
+    <Compile Include="Http\IHttpApiServerFactory.cs" />
     <Compile Include="IO\IFileSystem.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Messaging\IMessage.cs" />
@@ -137,7 +127,9 @@
     <Compile Include="Reflection\ReflectionExtensions.cs" />
     <Compile Include="Security\Hash.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\tools\nuget-1.8.40002\nuget.targets" />
   <PropertyGroup>

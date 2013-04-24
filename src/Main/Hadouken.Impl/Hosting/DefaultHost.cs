@@ -21,13 +21,18 @@ namespace Hadouken.Impl.Hosting
         private IPluginEngine _pluginEngine;
         private IHttpServer _httpServer;
 
-        public DefaultHost(IDataRepository data, IBitTorrentEngine torrentEngine, IMigrationRunner runner, IPluginEngine pluginEngine, IHttpServer httpServer)
+        private readonly IHttpApiServer _apiServer;
+
+        public DefaultHost(IHttpApiServerFactory httpApiServerFactory, IDataRepository data, IBitTorrentEngine torrentEngine, IMigrationRunner runner, IPluginEngine pluginEngine, IHttpServer httpServer)
         {
             _data = data;
             _torrentEngine = torrentEngine;
             _migratorRunner = runner;
             _pluginEngine = pluginEngine;
             _httpServer = httpServer;
+
+            _apiServer = httpApiServerFactory.CreateHttpApiServer(new Uri("http://localhost:8081/api"),
+                                                                  typeof (Kernel).Assembly);
 
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
@@ -55,6 +60,7 @@ namespace Hadouken.Impl.Hosting
             _pluginEngine.Load();
 
             _httpServer.Start();
+            _apiServer.Start();
         }
 
         public void Unload()

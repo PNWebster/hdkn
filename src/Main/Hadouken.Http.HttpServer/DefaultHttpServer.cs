@@ -28,8 +28,6 @@ namespace Hadouken.Http.HttpServer
         private HttpListener _listener;
         private string _webUIPath;
 
-        private static readonly string TokenCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private static readonly int TokenLength = 40;
         
         public DefaultHttpServer(IKeyValueStore keyValueStore, IRegistryReader registryReader, IFileSystem fileSystem)
         {
@@ -116,12 +114,12 @@ namespace Hadouken.Http.HttpServer
 
                 ReceiveLoop();
 
-                new Task(() => ProcessRequest(new HttpContext(context))).Start();
+                new Task(() => ProcessRequest(context)).Start();
 
             }, null);
         }
 
-        private void ProcessRequest(IHttpContext context)
+        private void ProcessRequest(HttpListenerContext context)
         {
             try
             {
@@ -129,15 +127,12 @@ namespace Hadouken.Http.HttpServer
 
                 if(IsAuthenticatedUser(context))
                 {
-                    string url = context.Request.Url.AbsolutePath;
-
-                    var result = (((url == "/api" || url == "/api/") && context.Request.QueryString["action"] != null)
-                                      ? FindAndExecuteAction(context)
-                                      : CheckFileSystem(context));
+                    var result = CheckFileSystem(context);
 
                     if (result != null)
                     {
-                        result.Execute(context);
+                        context.Response.ContentType = result.ContentType;
+                        context.Response.OutputStream.Write(result.Data, 0, result.Data.Length);
                     }
                     else
                     {
@@ -149,7 +144,7 @@ namespace Hadouken.Http.HttpServer
                 {
                     Logger.Info("Unauthorized user request.");
 
-                    context.Response.Unauthorized();
+                    OnUnauthorized(context);
                 }
 
                 context.Response.OutputStream.Close();
@@ -157,8 +152,28 @@ namespace Hadouken.Http.HttpServer
             }
             catch(Exception e)
             {
-                context.Response.Error(e);
+                OnError(context, e);
             }
+        }
+
+        private void OnUnauthorized(HttpListenerContext context)
+        {
+            context.Response.StatusCode = 401;
+        }
+
+        private void OnError(HttpListenerContext context, Exception e)
+        {
+            var page = "<h1>Internal Server Error</h1>";
+            page = page + "<h2><pre>" + context.Request.Url + "</pre></h2>";
+            page = page + "<div><pre>" + e.StackTrace + "</pre></div>";
+
+            var data = Encoding.UTF8.GetBytes(page);
+
+            context.Response.ContentType = "text/html";
+            context.Response.OutputStream.Write(data, 0, data.Length);
+
+            context.Response.OutputStream.Close();
+            context.Response.Close();
         }
 
         private void UnzipWebUI()
@@ -189,7 +204,7 @@ namespace Hadouken.Http.HttpServer
             }
         }
 
-        private ActionResult CheckFileSystem(IHttpContext context)
+        private FileSystemContent CheckFileSystem(HttpListenerContext context)
         {
             string path = _webUIPath + (context.Request.Url.AbsolutePath == "/" ? "/index.html" : context.Request.Url.AbsolutePath);
 
@@ -216,13 +231,13 @@ namespace Hadouken.Http.HttpServer
                         break;
                 }
 
-                return new ContentResult { Content = _fileSystem.ReadAllBytes(path), ContentType = contentType };
+                return new FileSystemContent { Data = _fileSystem.ReadAllBytes(path), ContentType = contentType };
             }
 
             return null;
         }
 
-        private bool IsAuthenticatedUser(IHttpContext context)
+        private bool IsAuthenticatedUser(HttpListenerContext context)
         {
             if (context.User.Identity.IsAuthenticated)
             {
@@ -235,48 +250,6 @@ namespace Hadouken.Http.HttpServer
             }
 
             return false;
-        }
-
-        private ActionResult FindAndExecuteAction(IHttpContext context)
-        {
-            string actionName = context.Request.QueryString["action"];
-
-            if (actionName == "gettoken")
-                return GenerateCSRFToken();
-
-            var action = (from a in Kernel.Resolver.GetAll<IApiAction>()
-                          where a.GetType().HasAttribute<ApiActionAttribute>()
-                          let attr = a.GetType().GetAttribute<ApiActionAttribute>()
-                          where attr != null && attr.Name == actionName
-                          select a).SingleOrDefault();
-
-            if (action != null)
-            {
-                try
-                {
-                    action.Context = context;
-                    return action.Execute();
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorException(String.Format("Could not execute action {0}", action.GetType().FullName), e);
-                }
-            }
-
-            return null;
-        }
-
-        private ActionResult GenerateCSRFToken()
-        {
-            var rnd = new Random(DateTime.Now.Millisecond);
-            var sb = new StringBuilder();
-
-            for (int i = 0; i < TokenLength; i++)
-            {
-                sb.Append(TokenCharacters[rnd.Next(0, TokenCharacters.Length - 1)]);
-            }
-
-            return new JsonResult() { Data = sb.ToString() };
         }
     }
 }
