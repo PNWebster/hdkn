@@ -106,6 +106,7 @@
     <Compile Include="Hosting\IHost.cs" />
     <Compile Include="Http\Api\PluginsController.cs" />
     <Compile Include="Http\Api\SystemController.cs" />
+    <Compile Include="Http\Api\TorrentsController.cs" />
     <Compile Include="Http\HttpApiController.cs" />
     <Compile Include="Http\IHttpApiServer.cs" />
     <Compile Include="Http\IHttpServer.cs" />
