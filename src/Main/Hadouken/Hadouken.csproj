@@ -104,6 +104,7 @@
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Hosting\IHost.cs" />
+    <Compile Include="Http\Api\PluginsController.cs" />
     <Compile Include="Http\Api\SystemController.cs" />
     <Compile Include="Http\HttpApiController.cs" />
     <Compile Include="Http\IHttpApiServer.cs" />
